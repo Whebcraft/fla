@@ -82,7 +82,7 @@ abstract class FramesActivity : BaseBillingActivity<Prefs>() {
         when (item.itemId) {
             R.id.about -> startActivity(Intent(this, AboutActivity::class.java))
             R.id.settings -> startActivity(Intent(this, SettingsActivity::class.java))
-            R.id.donate -> showInAppPurchasesDialog()
+            // R.id.donate -> showInAppPurchasesDialog()
         }
         return super.onOptionsItemSelected(item)
     }
