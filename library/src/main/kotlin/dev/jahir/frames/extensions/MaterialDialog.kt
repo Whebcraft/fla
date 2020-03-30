@@ -21,24 +21,30 @@ fun MaterialAlertDialogBuilder.title(title: String) = setTitle(title)
 fun MaterialAlertDialogBuilder.message(@StringRes messageResId: Int) = setMessage(messageResId)
 fun MaterialAlertDialogBuilder.message(message: String) = setMessage(message)
 
-fun MaterialAlertDialogBuilder.positiveButton(@StringRes positiveButtonResId: Int, onClick: (DialogInterface) -> Unit = {}) =
-    setPositiveButton(positiveButtonResId) { d, _ -> onClick(d) }
+fun MaterialAlertDialogBuilder.positiveButton(
+    @StringRes positiveButtonResId: Int,
+    onClick: (DialogInterface) -> Unit = {}
+) = setPositiveButton(positiveButtonResId) { d, _ -> onClick(d) }
 
 fun MaterialAlertDialogBuilder.positiveButton(
     positiveButtonText: String,
     onClick: (DialogInterface) -> Unit = {}
 ) = setPositiveButton(positiveButtonText) { d, _ -> onClick(d) }
 
-fun MaterialAlertDialogBuilder.negativeButton(@StringRes negativeButtonResId: Int, onClick: (DialogInterface) -> Unit = {}) =
-    setNegativeButton(negativeButtonResId) { d, _ -> onClick(d) }
+fun MaterialAlertDialogBuilder.negativeButton(
+    @StringRes negativeButtonResId: Int,
+    onClick: (DialogInterface) -> Unit = {}
+) = setNegativeButton(negativeButtonResId) { d, _ -> onClick(d) }
 
 fun MaterialAlertDialogBuilder.negativeButton(
     negativeButtonText: String,
     onClick: (DialogInterface) -> Unit = {}
 ) = setNegativeButton(negativeButtonText) { d, _ -> onClick(d) }
 
-fun MaterialAlertDialogBuilder.neutralButton(@StringRes neutralButtonResId: Int, onClick: (DialogInterface) -> Unit = {}) =
-    setNeutralButton(neutralButtonResId) { d, _ -> onClick(d) }
+fun MaterialAlertDialogBuilder.neutralButton(
+    @StringRes neutralButtonResId: Int,
+    onClick: (DialogInterface) -> Unit = {}
+) = setNeutralButton(neutralButtonResId) { d, _ -> onClick(d) }
 
 fun MaterialAlertDialogBuilder.neutralButton(
     neutralButtonText: String,

@@ -21,11 +21,10 @@ import dev.jahir.frames.extensions.setOnClickListener
 import dev.jahir.frames.extensions.singleChoiceItems
 import dev.jahir.frames.extensions.title
 import dev.jahir.frames.ui.activities.SettingsActivity
-import dev.jahir.frames.ui.activities.base.BaseThemedActivity
 import dev.jahir.frames.ui.fragments.base.BasePreferenceFragment
 import dev.jahir.frames.utils.Prefs
 
-open class SettingsFragment : BasePreferenceFragment<Prefs>() {
+open class SettingsFragment : BasePreferenceFragment() {
 
     private var currentThemeKey: Int = -1
 
@@ -35,7 +34,7 @@ open class SettingsFragment : BasePreferenceFragment<Prefs>() {
 
         val interfacePreferences = findPreference<PreferenceCategory?>("interface_prefs")
 
-        currentThemeKey = getPrefs().currentTheme.value
+        currentThemeKey = prefs.currentTheme.value
         val themePreference = findPreference<Preference?>("app_theme")
         themePreference?.setSummary(Prefs.ThemeKey.fromValue(currentThemeKey).stringResId)
         themePreference?.setOnClickListener {
@@ -45,44 +44,43 @@ open class SettingsFragment : BasePreferenceFragment<Prefs>() {
                     currentThemeKey = which
                 }
                 positiveButton(android.R.string.ok) {
-                    getPrefs().currentTheme = Prefs.ThemeKey.fromValue(currentThemeKey)
+                    prefs.currentTheme = Prefs.ThemeKey.fromValue(currentThemeKey)
                     it.dismiss()
-                    (activity as? BaseThemedActivity<*>)?.onThemeChanged()
                 }
             }
         }
 
         val amoledPreference = findPreference<SwitchPreference?>("use_amoled")
-        amoledPreference?.isChecked = getPrefs().usesAmoledTheme
-        amoledPreference?.setOnCheckedChangeListener {
-            getPrefs().usesAmoledTheme = it
-            (activity as? BaseThemedActivity<*>)?.onThemeChanged()
-        }
+        amoledPreference?.isChecked = prefs.usesAmoledTheme
+        amoledPreference?.setOnCheckedChangeListener { prefs.usesAmoledTheme = it }
 
         val coloredNavbarPref = findPreference<SwitchPreference?>("colored_navigation_bar")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
             interfacePreferences?.removePreference(coloredNavbarPref)
         else {
-            coloredNavbarPref?.isChecked = getPrefs().shouldColorNavbar
-            coloredNavbarPref?.setOnCheckedChangeListener {
-                getPrefs().shouldColorNavbar = it
-                (activity as? BaseThemedActivity<*>)?.onThemeChanged()
-            }
+            coloredNavbarPref?.isChecked = prefs.shouldColorNavbar
+            coloredNavbarPref?.setOnCheckedChangeListener { prefs.shouldColorNavbar = it }
         }
 
         val animationsPref = findPreference<SwitchPreference?>("interface_animations")
-        animationsPref?.isChecked = getPrefs().animationsEnabled
-        animationsPref?.setOnCheckedChangeListener { getPrefs().animationsEnabled = it }
+        animationsPref?.isChecked = prefs.animationsEnabled
+        animationsPref?.setOnCheckedChangeListener { prefs.animationsEnabled = it }
 
         val fullResPicturesPref = findPreference<SwitchPreference?>("full_res_previews")
-        fullResPicturesPref?.isChecked = getPrefs().shouldLoadFullResPictures
+        fullResPicturesPref?.isChecked = prefs.shouldLoadFullResPictures
         fullResPicturesPref?.setOnCheckedChangeListener {
-            getPrefs().shouldLoadFullResPictures = it
+            prefs.shouldLoadFullResPictures = it
+        }
+
+        val cropPicturesPrefs = findPreference<SwitchPreference?>("crop_pictures")
+        cropPicturesPrefs?.isChecked = prefs.shouldCropWallpaperBeforeApply
+        cropPicturesPrefs?.setOnCheckedChangeListener {
+            prefs.shouldCropWallpaperBeforeApply = it
         }
 
         val downloadLocationPref = findPreference<Preference?>("download_location")
         downloadLocationPref?.summary =
-            getString(R.string.download_location_summary) + "\n${getPrefs().downloadsFolder}"
+            getString(R.string.download_location_summary) + "\n${prefs.downloadsFolder}"
 
         val clearCachePref = findPreference<Preference?>("clear_data_cache")
         clearCachePref?.summary =
@@ -94,9 +92,9 @@ open class SettingsFragment : BasePreferenceFragment<Prefs>() {
         }
 
         val notificationsPrefs = findPreference<SwitchPreference?>("notifications")
-        notificationsPrefs?.isChecked = getPrefs().notificationsEnabled
+        notificationsPrefs?.isChecked = prefs.notificationsEnabled
         notificationsPrefs?.setOnCheckedChangeListener {
-            getPrefs().notificationsEnabled = it
+            prefs.notificationsEnabled = it
         }
 
         setupLegalLinks()

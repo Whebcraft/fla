@@ -22,7 +22,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
-@Suppress("unused")
+@Suppress("unused", "RemoveExplicitTypeArguments")
 abstract class WallpapersDataViewModel : ViewModel() {
 
     private val wallpapersData: MutableLiveData<List<Wallpaper>> by lazyMutableLiveData()
@@ -163,7 +163,7 @@ abstract class WallpapersDataViewModel : ViewModel() {
                     } catch (e: Exception) {
                         arrayListOf<Wallpaper>()
                     }
-                } else arrayListOf()
+                } else arrayListOf<Wallpaper>()
 
             val localWallpapers = try {
                 getWallpapersFromDatabase(context)
@@ -253,17 +253,15 @@ abstract class WallpapersDataViewModel : ViewModel() {
     }
 
     fun observeWallpapers(owner: LifecycleOwner, onUpdated: (List<Wallpaper>) -> Unit) {
-        wallpapersData.observe(owner, Observer<List<Wallpaper>> { r -> r?.let { onUpdated(it) } })
+        wallpapersData.observe(owner, Observer { r -> r?.let { onUpdated(it) } })
     }
 
     fun observeCollections(owner: LifecycleOwner, onUpdated: (ArrayList<Collection>) -> Unit) {
-        collectionsData.observe(
-            owner,
-            Observer<ArrayList<Collection>> { r -> r?.let { onUpdated(it) } })
+        collectionsData.observe(owner, Observer { r -> r?.let { onUpdated(it) } })
     }
 
     fun observeFavorites(owner: LifecycleOwner, onUpdated: (List<Wallpaper>) -> Unit) {
-        favoritesData.observe(owner, Observer<List<Wallpaper>> { r -> r?.let { onUpdated(it) } })
+        favoritesData.observe(owner, Observer { r -> r?.let { onUpdated(it) } })
     }
 
     fun destroy(owner: LifecycleOwner) {

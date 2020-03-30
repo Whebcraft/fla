@@ -1,21 +1,34 @@
 package dev.jahir.frames.ui.activities
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import dev.jahir.frames.R
 import dev.jahir.frames.extensions.findView
-import dev.jahir.frames.extensions.gone
 import dev.jahir.frames.extensions.resolveColor
+import dev.jahir.frames.extensions.setDefaultDashboardTheme
 import dev.jahir.frames.ui.activities.base.BaseThemedActivity
 import dev.jahir.frames.ui.fragments.SettingsFragment
 import dev.jahir.frames.utils.Prefs
 import dev.jahir.frames.utils.tintIcons
 
 open class SettingsActivity : BaseThemedActivity<Prefs>() {
+
+    private val preferencesListener: SharedPreferences.OnSharedPreferenceChangeListener by lazy {
+        SharedPreferences.OnSharedPreferenceChangeListener { _, prefKey ->
+            prefKey ?: return@OnSharedPreferenceChangeListener
+            when (prefKey) {
+                Prefs.CURRENT_THEME -> {
+                    setDefaultDashboardTheme()
+                    onThemeChanged()
+                }
+                Prefs.USES_AMOLED_THEME, Prefs.SHOULD_COLOR_NAVBAR -> onThemeChanged()
+            }
+        }
+    }
 
     override val prefs: Prefs by lazy { Prefs(this) }
     private val toolbar: Toolbar? by findView(R.id.toolbar)
@@ -26,8 +39,8 @@ open class SettingsActivity : BaseThemedActivity<Prefs>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_base)
-        findViewById<View?>(R.id.bottom_navigation)?.gone()
+        prefs.registerOnSharedPreferenceChangeListener(preferencesListener)
+        setContentView(R.layout.activity_fragments)
 
         setSupportActionBar(toolbar)
         supportActionBar?.let {
@@ -61,6 +74,7 @@ open class SettingsActivity : BaseThemedActivity<Prefs>() {
 
     override fun onDestroy() {
         super.onDestroy()
+        prefs.unregisterOnSharedPreferenceChangeListener(preferencesListener)
         preferenceDialog?.dismiss()
     }
 }

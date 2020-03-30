@@ -2,7 +2,6 @@ package dev.jahir.frames.extensions
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
@@ -13,6 +12,8 @@ import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import dev.jahir.frames.R
 import dev.jahir.frames.ui.activities.base.BaseThemedActivity
@@ -83,15 +84,16 @@ fun Context.toast(content: String, duration: Int = Toast.LENGTH_SHORT) {
 }
 
 @ColorInt
-fun Context.getRightNavigationBarColor(): Int = if (prefs.shouldColorNavbar) {
-    try {
-        resolveColor(R.attr.colorSurface, ContextCompat.getColor(this, R.color.surface))
-    } catch (e: Exception) {
+fun Context.getRightNavigationBarColor(): Int =
+    if (prefs.shouldColorNavbar && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        try {
+            resolveColor(R.attr.colorSurface, ContextCompat.getColor(this, R.color.surface))
+        } catch (e: Exception) {
+            Color.parseColor("#000000")
+        }
+    } else {
         Color.parseColor("#000000")
     }
-} else {
-    Color.parseColor("#000000")
-}
 
 @Suppress("DEPRECATION")
 val Context.currentVersionCode: Long
@@ -201,9 +203,16 @@ fun Context.clearCache() {
 val Context.prefs: Prefs
     get() = (this as? BaseThemedActivity<*>)?.prefs ?: Prefs(this)
 
-val Context.currentNightMode: Int
-    get() = try {
-        resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+fun Context.setDefaultDashboardTheme() {
+    try {
+        AppCompatDelegate.setDefaultNightMode(
+            when (prefs.currentTheme) {
+                Prefs.ThemeKey.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                Prefs.ThemeKey.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                else -> AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY or AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+        )
+        (this as? AppCompatActivity)?.delegate?.applyDayNight()
     } catch (e: Exception) {
-        Configuration.UI_MODE_NIGHT_UNDEFINED
     }
+}

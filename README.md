@@ -20,6 +20,7 @@ Free, feature-rich, easily customizable Android dashboard for wallpapers apps
 </a>
 
 ## Show some  :blue_heart:
+
 [![GitHub stars](https://img.shields.io/github/stars/jahirfiquitiva/Frames.svg?style=social&label=Star)](https://github.com/jahirfiquitiva/Frames)
 [![GitHub forks](https://img.shields.io/github/forks/jahirfiquitiva/Frames.svg?style=social&label=Fork)](https://github.com/jahirfiquitiva/Frames/fork)
 [![GitHub watchers](https://img.shields.io/github/watchers/jahirfiquitiva/Frames.svg?style=social&label=Watch)](https://github.com/jahirfiquitiva/Frames)
@@ -32,6 +33,7 @@ Free, feature-rich, easily customizable Android dashboard for wallpapers apps
 # Previews
 
 ### Customizable styles
+
 <p align="center">
 <img src="https://github.com/jahirfiquitiva/Frames/raw/master/art/1.png" height="350"/>
 <img src="https://github.com/jahirfiquitiva/Frames/raw/master/art/2.png" height="350"/>
@@ -41,6 +43,7 @@ Free, feature-rich, easily customizable Android dashboard for wallpapers apps
 </p>
 
 ### Full-screen Viewer / Multiple themes
+
 <p align="center">
 <img src="https://github.com/jahirfiquitiva/Frames/raw/master/art/6.png" height="350"/>
 <img src="https://github.com/jahirfiquitiva/Frames/raw/master/art/7.png" height="350"/>
@@ -49,6 +52,7 @@ Free, feature-rich, easily customizable Android dashboard for wallpapers apps
 </p>
 
 ### Credits / Settings
+
 <p align="center">
 <img src="https://github.com/jahirfiquitiva/Frames/raw/master/art/10.png" height="350"/>
 <img src="https://github.com/jahirfiquitiva/Frames/raw/master/art/11.png" height="350"/>
@@ -57,6 +61,7 @@ Free, feature-rich, easily customizable Android dashboard for wallpapers apps
 ---
 
 # Features:
+
 - Material Design dashboard.
 - License Checker.
 - Donations.
@@ -77,38 +82,46 @@ Free, feature-rich, easily customizable Android dashboard for wallpapers apps
 - Works with Android 4.1 and newer.
 
 ## Help translating
+
 :page_facing_up: Help making Frames available in more languages. [Click here to go to the translation site](https://crowdin.com/project/Frames/invite)
 
 ## Changelog
+
 :radio_button: You can find it in the [Releases page](https://github.com/jahirfiquitiva/Frames/releases)
 
 ---
 
 # Including in your project
+
 Frames is available via JitPack, so getting it as simple as adding it as a dependency, like this:
 
 1. Add JitPack repository to your root `build.gradle` file
-```gradle
-allprojects {
+   
+   ```gradle
+   allprojects {
     repositories {
         maven { url 'https://jitpack.io' }
     }
-}
-```
+   }
+   ```
 2. Add the dependency in your project `build.gradle` file
-```gradle
-dependencies {
-    implementation('dev.jahir:Frames:{latest version}@aar') {
+   
+   ```gradle
+   dependencies {
+    compile('dev.jahir:Frames:{latest version}@aar') {
         transitive = true
     }
-}
-```
-where `{latest version}` corresponds to published version in   [![JitPack](https://jitpack.io/v/dev.jahir/Frames.svg)](https://jitpack.io/#dev.jahir/Frames)
+   }
+   ```
+   
+   where `{latest version}` corresponds to published version in   [![JitPack](https://jitpack.io/v/dev.jahir/Frames.svg)](https://jitpack.io/#dev.jahir/Frames)
 
 ## How to implement
+
 :page_with_curl: Everything you need to know can be found in the **[Wiki Docs](https://github.com/jahirfiquitiva/Frames/wiki/)**
 
 ## Still need help :question:
+
 Just join our community and make a post. We'll help you as soon as possible. [![Telegram Chat](https://img.shields.io/badge/Telegram-Chat-0088cc.svg)](https://t.me/JFsDashSupport)
 
 ---
@@ -150,19 +163,19 @@ If you found this app/library helpful and want to thank me, you can:
 
 This app is shared under the CreativeCommons Attribution-ShareAlike license.
 
-	Copyright © 2020 Jahir Fiquitiva
-
-	Licensed under the CreativeCommons Attribution-ShareAlike 
-	4.0 International License. You may not use this file except in compliance 
-	with the License. You may obtain a copy of the License at
-
-	   http://creativecommons.org/licenses/by-sa/4.0/legalcode
-
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
+    Copyright © 2020 Jahir Fiquitiva
+    
+    Licensed under the CreativeCommons Attribution-ShareAlike 
+    4.0 International License. You may not use this file except in compliance 
+    with the License. You may obtain a copy of the License at
+    
+       http://creativecommons.org/licenses/by-sa/4.0/legalcode
+    
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 
 ## Library source
 

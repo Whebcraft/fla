@@ -18,19 +18,21 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.DialogFragment
 import androidx.palette.graphics.Palette
 import com.fondesa.kpermissions.PermissionStatus
-import com.github.chrisbanes.photoview.PhotoView
 import dev.jahir.frames.R
 import dev.jahir.frames.data.models.Wallpaper
 import dev.jahir.frames.extensions.*
 import dev.jahir.frames.ui.activities.base.BaseFavoritesConnectedActivity
 import dev.jahir.frames.ui.fragments.WallpapersFragment
+import dev.jahir.frames.ui.fragments.viewer.ApplierDialog
 import dev.jahir.frames.ui.fragments.viewer.DetailsFragment
+import dev.jahir.frames.ui.fragments.viewer.DownloadToApplyDialog
 import dev.jahir.frames.ui.fragments.viewer.SetAsOptionsDialog
+import dev.jahir.frames.ui.widgets.FramesPhotoView
 import dev.jahir.frames.utils.Prefs
 import dev.jahir.frames.utils.tint
-import kotlin.math.roundToInt
 
 open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
 
@@ -54,6 +56,7 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
     }
 
     private var downloadBlockedDialog: AlertDialog? = null
+    private var applierDialog: DialogFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,8 +101,6 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
                 wallpaper.buildImageTransitionName(currentWallPosition)
             )
         }
-        (image as? PhotoView)?.scale = 1.0F
-        image?.loadFramesPic(wallpaper.url, wallpaper.thumbnail, null, true) { generatePalette(it) }
 
         setSupportActionBar(toolbar)
         supportActionBar?.let {
@@ -109,13 +110,16 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
         }
         initWindow()
         toolbar?.tint(ContextCompat.getColor(this, R.color.white))
-        supportStartPostponedEnterTransition()
 
-        image?.setOnClickListener { toggleSystemUI() }
+        (image as? FramesPhotoView)?.setOnPhotoTapListener { _, _, _ -> toggleSystemUI() }
+            ?: image?.setOnClickListener { toggleSystemUI() }
+        image?.loadFramesPic(wallpaper.url, wallpaper.thumbnail, null, true) { generatePalette(it) }
+
+        supportStartPostponedEnterTransition()
 
         isInFavorites =
             intent?.extras?.getBoolean(WallpapersFragment.WALLPAPER_IN_FAVS_EXTRA, false)
-                ?: wallpaper.isInFavorites ?: false
+                ?: wallpaper.isInFavorites
 
         wallpapersViewModel.observeFavorites(this) {
             this.isInFavorites = it.any { wall -> wall.url == wallpaper.url }
@@ -166,16 +170,33 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
         )
     }
 
+    private fun dismissApplierDialog() {
+        try {
+            applierDialog?.dismiss()
+        } catch (e: Exception) {
+        }
+        applierDialog = null
+    }
+
+    private fun dismissDownloadBlockedDialog() {
+        try {
+            downloadBlockedDialog?.dismiss()
+        } catch (e: Exception) {
+        }
+        downloadBlockedDialog = null
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        downloadBlockedDialog?.dismiss()
+        (image as? FramesPhotoView)?.setScale(1F, true)
+        dismissApplierDialog()
+        dismissDownloadBlockedDialog()
         try {
             val bmp = (image?.drawable as? BitmapDrawable?)?.bitmap
             if (bmp?.isRecycled == false) bmp.recycle()
         } catch (e: Exception) {
         }
         try {
-            image?.setImageBitmap(null)
             image?.setImageDrawable(null)
         } catch (e: Exception) {
         }
@@ -183,14 +204,14 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
 
     private fun generatePalette(drawable: Drawable?) {
         supportStartPostponedEnterTransition()
-        (image as? PhotoView)?.scale = 1.0F
+        findViewById<View?>(R.id.loading)?.gone()
         if (!shouldShowWallpapersPalette()) {
             setBackgroundColor()
             return
         }
         drawable?.asBitmap()?.let { bitmap ->
             Palette.from(bitmap)
-                .maximumColorCount((MAX_FRAMES_PALETTE_COLORS * 1.5).roundToInt())
+                .maximumColorCount(MAX_FRAMES_PALETTE_COLORS * 2)
                 .generate {
                     setBackgroundColor(it?.bestSwatch?.rgb ?: 0)
                     detailsFragment.palette = it
@@ -262,7 +283,7 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
             val timeLeft = MIN_TIME - elapsedTime
             val timeLeftText = timeLeft.toReadableTime()
 
-            downloadBlockedDialog?.dismiss()
+            dismissDownloadBlockedDialog()
             downloadBlockedDialog = mdDialog {
                 title(R.string.prevent_download_title)
                 message(getString(R.string.prevent_download_content, timeLeftText))
@@ -279,7 +300,16 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
 
     private fun applyWallpaper(wallpaper: Wallpaper?) {
         wallpaper ?: return
-        SetAsOptionsDialog.show(this, wallpaper)
+        dismissApplierDialog()
+        applierDialog = SetAsOptionsDialog.create(wallpaper)
+        applierDialog?.show(supportFragmentManager, SetAsOptionsDialog.TAG)
+    }
+
+    internal fun showApplierDialog(wallpaper: Wallpaper?, selectedOption: Int = -1) {
+        wallpaper ?: return
+        dismissApplierDialog()
+        applierDialog = ApplierDialog.create(wallpaper, selectedOption)
+        applierDialog?.show(supportFragmentManager, DownloadToApplyDialog.TAG)
     }
 
     private fun shouldShowWallpapersPalette(): Boolean = try {
@@ -292,6 +322,9 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
     override val shouldChangeStatusBarLightStatus: Boolean = false
     override val shouldChangeNavigationBarLightStatus: Boolean = false
 
+    override fun canToggleSystemUIVisibility(): Boolean =
+        intent?.getBooleanExtra(CAN_TOGGLE_SYSTEMUI_VISIBILITY_KEY, true) ?: true
+
     companion object {
         internal const val MIN_TIME: Long = 3 * 60 * 60000
         internal const val REQUEST_CODE = 10
@@ -300,6 +333,7 @@ open class ViewerActivity : BaseFavoritesConnectedActivity<Prefs>() {
         internal const val FAVORITES_NOT_MODIFIED_RESULT = 0
         internal const val CURRENT_WALL_POSITION = "curr_wall_pos"
         internal const val LICENSE_CHECK_ENABLED = "license_check_enabled"
+        internal const val CAN_TOGGLE_SYSTEMUI_VISIBILITY_KEY = "can_toggle_visibility"
         private const val CLOSING_KEY = "closing"
         private const val TRANSITIONED_KEY = "transitioned"
         private const val IS_IN_FAVORITES_KEY = "is_in_favorites"

@@ -1,12 +1,10 @@
 package dev.jahir.frames.ui.activities.base
 
 import android.os.Bundle
-import android.os.Handler
 import androidx.annotation.StyleRes
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import dev.jahir.frames.R
-import dev.jahir.frames.extensions.currentNightMode
 import dev.jahir.frames.extensions.getRightNavigationBarColor
 import dev.jahir.frames.extensions.isDark
 import dev.jahir.frames.extensions.navigationBarColor
@@ -15,12 +13,12 @@ import dev.jahir.frames.extensions.resolveColor
 import dev.jahir.frames.extensions.restart
 import dev.jahir.frames.extensions.statusBarColor
 import dev.jahir.frames.extensions.statusBarLight
-import dev.jahir.frames.ui.FramesApplication
 import dev.jahir.frames.utils.Prefs
+import dev.jahir.frames.utils.postDelayed
 
 abstract class BaseThemedActivity<out P : Prefs> : BaseFinishResultActivity() {
 
-    private var lastTheme: Prefs.ThemeKey = Prefs.ThemeKey.FOLLOW_SYSTEM
+    private var lastTheme: Int = Prefs.ThemeKey.FOLLOW_SYSTEM.value
     private var wasUsingAmoled: Boolean = false
     private var coloredNavbar: Boolean = false
 
@@ -33,35 +31,29 @@ abstract class BaseThemedActivity<out P : Prefs> : BaseFinishResultActivity() {
     abstract val prefs: P
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         setCustomTheme()
         super.onCreate(savedInstanceState)
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
     }
 
     override fun onResume() {
         super.onResume()
-        if (lastTheme != prefs.currentTheme || currentNightMode != prefs.lastNightMode
-            || wasUsingAmoled != prefs.usesAmoledTheme || coloredNavbar != prefs.shouldColorNavbar) {
-            prefs.lastNightMode = currentNightMode
+        if (lastTheme != prefs.currentTheme.value
+            || wasUsingAmoled != prefs.usesAmoledTheme
+            || coloredNavbar != prefs.shouldColorNavbar)
             onThemeChanged()
-        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
-        lastTheme = prefs.currentTheme
+        lastTheme = prefs.currentTheme.value
         wasUsingAmoled = prefs.usesAmoledTheme
         coloredNavbar = prefs.shouldColorNavbar
     }
 
-    @Suppress("MemberVisibilityCanBePrivate")
-    fun onThemeChanged() {
-        (applicationContext as? FramesApplication)?.setDefaultNightMode()
-        postRecreate()
-    }
-
-    private fun postRecreate() {
-        Handler().post { restart() }
+    internal fun onThemeChanged() {
+        delegate.applyDayNight()
+        postDelayed(5) { restart() }
     }
 
     @Suppress("DEPRECATION")
